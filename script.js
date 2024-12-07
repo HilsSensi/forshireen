@@ -11,7 +11,7 @@ navigator.mediaDevices.getUserMedia({ video: true })
   })
   .catch(err => {
     console.error('Gagal mengakses kamera:', err);
-    alert('Tidak dapat mengakses kamera.');
+    alert('Tidak dapat mengakses kmera.');
   });
 
 // Fungsi untuk mengambil foto
