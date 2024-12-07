@@ -1,13 +1,28 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>Spy Web</title>  
-    <script src="script.js" defer></script>  
-</head>  
-<body>  
-    <h1>Spy Tool</h1>  
-    <p>Memulai pengambilan data...</p>  
-</body>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ambil Foto</title>
+  <style>
+    video, canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    #controls {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ambil Foto dengan Kamera</h1>
+  <video id="video" autoplay></video>
+  <canvas id="canvas" style="display: none;"></canvas>
+  <div id="controls">
+    <button id="takePhoto">Ambil Foto</button>
+    <button id="downloadPhoto" style="display: none;">Unduh Foto</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
 </html>
