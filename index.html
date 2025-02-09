@@ -1,28 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ambil Ft</title>
-  <style>
-    video, canvas {
-      max-width: 100%;
-      height: auto;
-    }
-    #controls {
-      margin-top: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peringatan Penipuan - Bank Palsu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .container {
+            width: 350px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        .logo {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0033a0;
+        }
+        .input-group {
+            text-align: left;
+            margin: 10px 0;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn {
+            background: #0033a0;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .btn:hover {
+            background: #002080;
+        }
+        .warning {
+            color: red;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Ambil Foto dengan Kamera</h1>
-  <video id="video" autoplay></video>
-  <canvas id="canvas" style="display: none;"></canvas>
-  <div id="controls">
-    <button id="takePhoto">Ambil Foto</button>
-    <button id="downloadPhoto" style="display: none;">Unduh Foto</button>
-  </div>
+    <div class="container">
+        <!-- Logo dari URL -->
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAABkW7XSAAAACXBIWXMAAAsTAAALEwEAmpwYAAAC2UlEQVR4nO3dO27EUBBA0aeBIBxoGTIpqCvoCDqcFCrqJSwlFKFQoD4Yv4eVgdFxJdpIhbbV3Lna8Lkfw7f83VvT+zMJfJ9fuUBQLBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBUqFCjUqlIhUKBcoGDdpwyhSfT4wA9DF7oCnAuQC4BDUjHfP4IB4AAM9QgNgIAzVnOoFgLQNgCI7Qc7JUDgFkChz0xPMPkChATKP8Xx9bZ6gt4TwGhAm0F2AbggdBygIxDtNgGeEBt1moCNCLBHaZEEFEKAFl1CgFCqFCgVKkUKNSoUqCQZL6/WwOgIoFShUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNSqUiFQoFSoUKNwvpBqw+kMbBfqeUoHvpxMYuS8m7rYymS8V7nHkW9s14HTmn1XFtbVtxbWFtxcWVvxcG+7X9u8r2H7vdYMyA3s94XTGcAjsCYwf4LkEKkKYxwCUOOj6whwA3hwtwpUKD1OBQId58QQfHIAAAQJEUoNqFzY4AAAAAElFTkSuQmCC" alt="Bank Logo" class="logo">
+        <h2>Login ke Akun Anda</h2>
+        
+        <form action="#" method="POST">
+            <div class="input-group">
+                <label for="rekening">Nomor Rekening</label>
+                <input type="text" id="rekening" name="rekening" placeholder="Masukkan Nomor Rekening">
+            </div>
+            
+            <div class="input-group">
+                <label for="pin">PIN</label>
+                <input type="password" id="pin" name="pin" placeholder="Masukkan PIN">
+            </div>
+            
+            <button type="submit" class="btn">Login</button>
+        </form>
 
-  <script src="script.js"></script>
+        <p class="warning">⚠️ Jangan pernah memasukkan data Anda di situs yang mencurigakan!</p>
+    </div>
 </body>
 </html>
