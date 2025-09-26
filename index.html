@@ -27,13 +27,23 @@
   <header>📊 Catatan Uang Jajan</header>
 
   <div class="container">
-    <!-- Ringkasan Bulanan -->
+    <!-- Ringkasan -->
     <div class="card summary">
       <div class="pemasukan">Pemasukan<br><span id="totalPemasukan">0</span></div>
       <div class="pengeluaran">Pengeluaran<br><span id="totalPengeluaran">0</span></div>
       <div class="saldo">Saldo<br><span id="saldo">0</span></div>
     </div>
-    <div class="note" id="labelBulan">Bulan aktif: —</div>
+    <div class="note" id="labelBulan">Periode aktif: —</div>
+
+    <!-- Pilih Mode -->
+    <div class="card">
+      <label for="summaryMode">Lihat Ringkasan:</label>
+      <select id="summaryMode">
+        <option value="harian">Harian</option>
+        <option value="mingguan">Mingguan</option>
+        <option value="bulanan" selected>Bulanan</option>
+      </select>
+    </div>
 
     <!-- Input transaksi -->
     <div class="card">
@@ -44,12 +54,15 @@
       <div style="margin-bottom:8px;">
         <input type="text" id="keterangan" placeholder="Keterangan" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;">
       </div>
+      <div style="margin-bottom:8px;">
+        <input type="date" id="tanggalInput" style="width:100%;padding:6px;border:1px solid #d1d5db;border-radius:6px;">
+      </div>
       <div style="display:flex;gap:8px;justify-content:space-between;">
-        <button class="btn-green" onclick="tambahTransaksi('pemasukan', jumlah.value, keterangan.value)">+ Pemasukan</button>
-        <button class="btn-red"   onclick="tambahTransaksi('pengeluaran', jumlah.value, keterangan.value)">- Pengeluaran</button>
+        <button class="btn-green" onclick="tambahTransaksi('pemasukan', jumlah.value, keterangan.value, tanggalInput.value)">+ Pemasukan</button>
+        <button class="btn-red"   onclick="tambahTransaksi('pengeluaran', jumlah.value, keterangan.value, tanggalInput.value)">- Pengeluaran</button>
       </div>
       <div style="margin-top:10px;">
-        <button onclick="tambahTransaksi('pemasukan',30000,'Uang Jajan Harian')">+ Rp30.000 (Jajan Sekolah)</button>
+        <button onclick="tambahTransaksi('pemasukan',30000,'Uang Jajan Harian',tanggalInput.value)">+ Rp30.000 (Jajan Sekolah)</button>
       </div>
     </div>
 
@@ -88,10 +101,13 @@
   const saldoEl = document.getElementById("saldo");
   const labelBulanEl = document.getElementById("labelBulan");
   const motivasiEl = document.getElementById("motivasi");
+  const summaryMode = document.getElementById("summaryMode");
+  const tanggalInput = document.getElementById("tanggalInput");
   const ctx = document.getElementById("pengeluaranChart").getContext("2d");
   let chart;
 
-  // 31+ motivasi
+  tanggalInput.value = new Date().toISOString().split("T")[0];
+
   const motivasiList = [
     "Elon Musk: Jangan takut gagal, takutlah kalau tidak pernah mencoba.",
     "Warren Buffett: Habiskan lebih sedikit dari yang kamu hasilkan.",
@@ -102,28 +118,7 @@
     "Oprah Winfrey: Ubah luka menjadi kebijaksanaan.",
     "Jack Ma: Jangan menyerah, hari ini sulit, besok lebih sulit, tapi lusa akan indah.",
     "Larry Page: Selalu berusaha melakukan hal-hal yang sedikit gila.",
-    "Sergey Brin: Jangan takut mencoba hal-hal yang tidak biasa.",
-    "Richard Branson: Bisnis adalah seni untuk menciptakan sesuatu yang menyenangkan.",
-    "Michael Bloomberg: Jangan menunggu orang lain untuk membuat keputusan hidupmu.",
-    "Howard Schultz: Jangan takut bermimpi besar.",
-    "Amancio Ortega: Sederhana adalah kunci keberlanjutan.",
-    "Carlos Slim: Fokus pada solusi, bukan masalah.",
-    "Ray Dalio: Disiplin adalah jalan menuju kebebasan.",
-    "Mukesh Ambani: Semua yang kamu butuhkan adalah tekad dan kerja keras.",
-    "Larry Ellison: Ambil risiko, tanpa itu kamu tidak akan tumbuh.",
-    "Bill Gates: Jika kamu lahir miskin itu bukan salahmu, tapi mati miskin adalah salahmu.",
-    "Jeff Bezos: Keras kepala dalam visi, fleksibel dalam detail.",
-    "Mark Zuckerberg: Risiko terbesar adalah tidak mengambil risiko.",
-    "Elon Musk: Jika sesuatu penting, lakukan meskipun peluangnya melawanmu.",
-    "Warren Buffett: Berinvestasi pada dirimu sendiri adalah investasi terbaik.",
-    "Steve Jobs: Waktumu terbatas, jadi jangan sia-siakan untuk hidup seperti orang lain.",
-    "Oprah Winfrey: Keberuntungan adalah ketika persiapan bertemu dengan kesempatan.",
-    "Bill Gates: Kesabaran adalah kunci kesuksesan.",
-    "Jeff Bezos: Tetap lapar, tetap penasaran.",
-    "Jack Ma: Jangan pernah bersaing, buat dirimu berbeda.",
-    "Mark Cuban: Belajarlah dari kegagalan, jangan biarkan itu menghentikanmu.",
-    "Warren Buffett: Waktu adalah teman dari bisnis yang hebat.",
-    "Elon Musk: Bekerjalah seperti neraka. Jika orang lain bekerja 40 jam seminggu, kerjalah 100 jam."
+    "Sergey Brin: Jangan takut mencoba hal-hal yang tidak biasa."
   ];
 
   function acakMotivasi(){
@@ -151,30 +146,49 @@
     });
   }
 
-  // === FIX UTAMA: ringkasan dihitung per BULAN aktif ===
-  function getBulanAktif(){
-    if (filterTanggal.value) return filterTanggal.value.slice(0,7); // bulan dari tanggal yang dipilih
-    if (transaksi.length){
-      const latest = [...transaksi].sort((a,b)=>b.tanggal.localeCompare(a.tanggal))[0].tanggal;
-      return latest.slice(0,7); // bulan transaksi terbaru
-    }
-    return new Date().toISOString().slice(0,7); // fallback
-  }
-
-  function namaBulan(b){
-    const [y,m]=b.split("-"); const nama=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
-    return `${nama[parseInt(m)-1]} ${y}`;
+  function getStartOfWeek(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(d.setDate(diff));
   }
 
   function updateSummary(){
-    const bulanAktif = getBulanAktif();
-    const dataBulan = transaksi.filter(t=> t.tanggal.startsWith(bulanAktif));
-    let pemasukan=0, pengeluaran=0;
-    dataBulan.forEach(t=> t.jenis==="pemasukan" ? pemasukan+=t.jumlah : pengeluaran+=t.jumlah);
-    totalPemasukanEl.textContent = pemasukan.toLocaleString('id-ID');
-    totalPengeluaranEl.textContent = pengeluaran.toLocaleString('id-ID');
-    saldoEl.textContent = (pemasukan-pengeluaran).toLocaleString('id-ID');
-    labelBulanEl.textContent = "Bulan aktif: " + namaBulan(bulanAktif);
+    let totalPemasukan=0, totalPengeluaran=0;
+    const today=new Date();
+
+    if(summaryMode.value==="bulanan"){
+      const bulan=today.toISOString().slice(0,7);
+      transaksi.filter(t=>t.tanggal.startsWith(bulan)).forEach(t=>{
+        if(t.jenis==="pemasukan") totalPemasukan+=t.jumlah;
+        else totalPengeluaran+=t.jumlah;
+      });
+      labelBulanEl.textContent="Periode aktif: Bulan ini";
+
+    }else if(summaryMode.value==="mingguan"){
+      const start=getStartOfWeek(today);
+      const end=new Date(start); end.setDate(end.getDate()+6);
+      transaksi.forEach(t=>{
+        const tgl=new Date(t.tanggal);
+        if(tgl>=start && tgl<=end){
+          if(t.jenis==="pemasukan") totalPemasukan+=t.jumlah;
+          else totalPengeluaran+=t.jumlah;
+        }
+      });
+      labelBulanEl.textContent="Periode aktif: Mingguan (Senin-Minggu)";
+
+    }else if(summaryMode.value==="harian"){
+      const hariIni=today.toISOString().split("T")[0];
+      transaksi.filter(t=>t.tanggal===hariIni).forEach(t=>{
+        if(t.jenis==="pemasukan") totalPemasukan+=t.jumlah;
+        else totalPengeluaran+=t.jumlah;
+      });
+      labelBulanEl.textContent="Periode aktif: Hari ini";
+    }
+
+    totalPemasukanEl.textContent=totalPemasukan.toLocaleString("id-ID");
+    totalPengeluaranEl.textContent=totalPengeluaran.toLocaleString("id-ID");
+    saldoEl.textContent=(totalPemasukan-totalPengeluaran).toLocaleString("id-ID");
   }
 
   function updateChart(dataHarian){
@@ -208,18 +222,17 @@
     });
 
     updateSummary();
-
     if(filter){
       const dataHarian = transaksi.filter(t=>t.tanggal===filter);
       updateChart(dataHarian);
     }else{
-      updateChart([]); // kosongkan chart bila tanpa filter
+      updateChart([]);
     }
-
     renderFilterTanggal();
   }
 
   filterTanggal.addEventListener("change", render);
+  summaryMode.addEventListener("change", render);
 
   render();
   acakMotivasi();
