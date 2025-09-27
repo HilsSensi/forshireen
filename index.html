@@ -1,256 +1,812 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catatan Uang Jajan</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f3f4f6;color:#111827}
-    header{background:#2563eb;color:#fff;text-align:center;padding:15px;font-size:1.2em;font-weight:bold}
-    .container{padding:15px;max-width:480px;margin:auto}
-    .card{background:#fff;border-radius:12px;padding:15px;margin-bottom:15px;box-shadow:0 2px 5px rgba(0,0,0,.1)}
-    .summary{display:flex;justify-content:space-between;text-align:center;font-size:.9em}
-    .summary div{flex:1;padding:8px}
-    .pemasukan{color:#16a34a}.pengeluaran{color:#dc2626}.saldo{color:#2563eb;font-weight:bold}
-    table{width:100%;border-collapse:collapse;font-size:.85em}
-    table th,table td{border:1px solid #e5e7eb;padding:6px;text-align:center}
-    table th{background:#f9fafb}
-    button{background:#2563eb;color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.85em}
-    button:hover{opacity:.9}
-    .btn-red{background:#dc2626}.btn-green{background:#16a34a}
-    .motivation{font-style:italic;text-align:center;font-size:.9em;color:#4b5563;margin-top:10px}
-    .note{font-size:.8em;text-align:center;color:#6b7280;margin-top:4px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catatan Uang Jajan | Optimal & Mobile-Friendly 💰</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        :root {
+            /* Warna Palet */
+            --color-primary: #3498db; /* Biru */
+            --color-success: #2ecc71; /* Hijau */
+            --color-danger: #e74c3c; /* Merah */
+            --color-warning: #f39c12; /* Kuning */
+            --color-background: #f0f4f8; /* Abu Muda */
+            --color-text: #2c3e50;
+            --color-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-background); 
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 750px; 
+            margin: 0 auto;
+            padding: 20px 15px; 
+            background-color: var(--color-white);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            min-height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--color-primary); 
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.8em;
+        }
+        
+        h2 {
+            font-weight: 600;
+            color: var(--color-text);
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: #ecf0f1;
+            margin: 25px 0;
+        }
+
+        /* --- Saran Keuangan Cerdas (AI Advice Box) --- */
+        .advice-box {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fff3cd; 
+            border: 1px solid #ffeeba;
+            color: #856404;
+            display: none; 
+            font-size: 0.9em;
+        }
+        
+        .advice-box strong {
+            color: var(--color-text);
+        }
+        
+        .advice-box ul {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+
+        /* --- Kartu Ringkasan (Responsive Grid) --- */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            color: var(--color-white);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .income-card {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+        }
+
+        .expense-card {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .balance-card {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+        
+        .balance-card.critical {
+             background: linear-gradient(45deg, #f39c12, #d8890e);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+
+        .card p {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+
+        /* --- Form Transaksi --- */
+        .transaction-form {
+            padding: 20px;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            background: #fdfdfd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-direction: column; 
+        }
+
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 0.9em;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.9em;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-direction: column; 
+        }
+
+        .button-group button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.1s;
+            font-size: 1em;
+        }
+        
+        .button-group button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-income {
+            background-color: var(--color-success);
+            color: var(--color-white);
+        }
+
+        .btn-expense {
+            background-color: var(--color-danger);
+            color: var(--color-white);
+        }
+
+        .btn-quick {
+            background-color: var(--color-warning); 
+            color: var(--color-white);
+        }
+
+        .btn-income:hover { background-color: #27ae60; }
+        .btn-expense:hover { background-color: #c0392b; }
+        .btn-quick:hover { background-color: #d8890e; }
+
+        /* --- Riwayat Transaksi --- */
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-controls label {
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .filter-controls select, .filter-controls input[type="date"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .history-table-container {
+            overflow-x: auto;
+        }
+
+        #transactionTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+        }
+
+        #transactionTable th, #transactionTable td {
+            padding: 12px 10px; 
+            border-bottom: 1px solid #ecf0f1;
+            text-align: left;
+            font-size: 0.85em; 
+        }
+
+        #transactionTable th {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        #transactionTable tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .income-row { color: #27ae60; }
+        .expense-row { color: #c0392b; }
+        
+        .income-row td:nth-child(3) { font-weight: 600; }
+        .expense-row td:nth-child(3) { font-weight: 600; }
+
+
+        .delete-btn {
+            background-color: var(--color-danger);
+            color: var(--color-white);
+            border: none;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background-color 0.2s;
+        }
+
+        .delete-btn:hover { background-color: #c0392b; }
+
+        /* --- Motivasi (Gaya diperbarui untuk kutipan acak) --- */
+        .motivation {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            color: #4a698c;
+            border-left: 5px solid var(--color-primary);
+            font-size: 0.95em;
+        }
+        
+        .motivation blockquote {
+            margin: 0;
+            font-style: italic;
+            font-weight: 500;
+        }
+        
+        .motivation cite {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #7f8c8d;
+            font-style: normal;
+        }
+        
+        /* --- Media Query untuk Desktop/Tablet (Resolusi > 600px) --- */
+        @media (min-width: 600px) {
+            .container {
+                padding: 30px 25px;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+
+            .form-row {
+                flex-direction: row; 
+            }
+            
+            .button-group {
+                flex-direction: row; 
+            }
+            
+            .button-group button {
+                width: auto;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>📊 Catatan Uang Jajan</header>
+    <div class="container">
+        <h1>Catatan Uang Jajan</h1>
 
-  <div class="container">
-    <!-- Ringkasan Bulanan -->
-    <div class="card summary">
-      <div class="pemasukan">Pemasukan<br><span id="totalPemasukan">0</span></div>
-      <div class="pengeluaran">Pengeluaran<br><span id="totalPengeluaran">0</span></div>
-      <div class="saldo">Saldo<br><span id="saldo">0</span></div>
+        <div id="adviceBox" class="advice-box">
+            <strong>Saran Keuangan Cerdas dari AI 🤖</strong>
+            <p id="adviceMessage">Analisis sedang berjalan...</p>
+        </div>
+
+        <section class="summary-section">
+            <h2>Ringkasan Total</h2>
+            <div class="summary-cards">
+                <div class="card income-card">
+                    <h3>Pemasukan</h3>
+                    <p id="totalIncome">Rp0</p>
+                </div>
+                <div class="card expense-card">
+                    <h3>Pengeluaran</h3>
+                    <p id="totalExpense">Rp0</p>
+                </div>
+                <div id="balanceCard" class="card balance-card">
+                    <h3>Saldo Akhir</h3>
+                    <p id="currentBalance">Rp0</p>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <section class="transaction-form">
+            <h2>Tambah Transaksi Baru</h2>
+            <form id="transactionForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="transactionDate">Tanggal Transaksi:</label>
+                        <input type="date" id="transactionDate" value="" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Keterangan:</label>
+                        <input type="text" id="description" placeholder="Misal: Beli nasi goreng" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="amount">Jumlah (Rp):</label>
+                        <input type="number" id="amount" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Kategori Pengeluaran (Wajib jika Pengeluaran):</label>
+                        <select id="category">
+                            <option value="">Pilih Kategori...</option>
+                            <option value="Makanan">Makanan & Minuman</option>
+                            <option value="Transportasi">Transportasi</option>
+                            <option value="Edukasi">Edukasi/Peralatan</option>
+                            <option value="Hiburan">Hiburan</option>
+                            <option value="Lain-lain">Lain-lain</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" id="btnIncome" class="btn-income">📥 + Pemasukan</button>
+                    <button type="submit" id="btnExpense" class="btn-expense">📤 - Pengeluaran</button>
+                    <button type="button" id="btnQuickIncome" class="btn-quick">➕ Rp30.000 (Jajan Sekolah)</button>
+                </div>
+            </form>
+        </section>
+
+        <hr>
+
+        <section class="history">
+            <h2>Riwayat Transaksi</h2>
+            <div class="filter-controls">
+                <label for="filterType">Filter:</label>
+                <select id="filterType">
+                    <option value="all">Semua</option>
+                    <option value="today">Hari Ini</option>
+                    <option value="this-week">Minggu Ini (7 Hari Terakhir)</option>
+                    <option value="this-month">Bulan Ini</option>
+                    <option value="date-range">Rentang Tanggal Custom</option>
+                </select>
+                <input type="date" id="startDate" style="display:none;">
+                <input type="date" id="endDate" style="display:none;">
+            </div>
+
+            <div class="history-table-container">
+                <table id="transactionTable">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Jenis</th>
+                            <th>Jumlah</th>
+                            <th>Keterangan</th>
+                            <th>Kategori</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionList">
+                        </tbody>
+                </table>
+                <p id="noTransactions" style="text-align: center; margin-top: 20px;">Belum ada transaksi.</p>
+            </div>
+        </section>
+
+        <hr>
+
+        <footer class="motivation">
+            <blockquote id="quoteText">Memuat motivasi terbaik...</blockquote>
+            <cite id="quoteAuthor">Tokoh Sukses</cite>
+        </footer>
     </div>
-    <div class="note" id="labelBulan">Bulan aktif: —</div>
 
-    <!-- Input transaksi -->
-    <div class="card">
-      <h3>Tambah Transaksi</h3>
-      <div style="margin-bottom:8px;">
-        <input type="number" id="jumlah" placeholder="Jumlah" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;">
-      </div>
-      <div style="margin-bottom:8px;">
-        <input type="text" id="keterangan" placeholder="Keterangan" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;">
-      </div>
-      <div style="display:flex;gap:8px;justify-content:space-between;">
-        <button class="btn-green" onclick="tambahTransaksi('pemasukan', jumlah.value, keterangan.value)">+ Pemasukan</button>
-        <button class="btn-red"   onclick="tambahTransaksi('pengeluaran', jumlah.value, keterangan.value)">- Pengeluaran</button>
-      </div>
-      <div style="margin-top:10px;">
-        <button onclick="tambahTransaksi('pemasukan',30000,'Uang Jajan Harian')">+ Rp30.000 (Jajan Sekolah)</button>
-      </div>
-    </div>
+    <script>
+        let transactions = [];
+        const STORAGE_KEY = 'uangJajanTransactionsV3'; 
+        
+        // --- DATA MOTIVASI YANG BANYAK BANGET ---
+        const MOTIVATIONS = [
+            { quote: "Cara untuk memulai adalah berhenti berbicara dan mulai melakukan.", author: "Walt Disney" },
+            { quote: "Keberanian adalah harga yang dituntut kehidupan untuk memberikan kedamaian.", author: "Amelia Earhart" },
+            { quote: "Rahasia untuk maju adalah memulai.", author: "Mark Twain" },
+            { quote: "Bukan yang terkuat dari spesies yang bertahan hidup, juga bukan yang paling cerdas, tapi yang paling responsif terhadap perubahan.", author: "Charles Darwin" },
+            { quote: "Sukses bukanlah kunci kebahagiaan. Kebahagiaan adalah kunci kesuksesan.", author: "Albert Schweitzer" },
+            { quote: "Anda tidak dapat menghabiskan jalan menuju kekayaan.", author: "Suze Orman (Pakar Keuangan)" },
+            { quote: "Jangan biarkan uang menjadi raja, buat uang menjadi budak.", author: "P.T. Barnum" },
+            { quote: "Uang adalah alat yang luar biasa; ia dapat melayani Anda, atau mendominasi Anda.", author: "Gary Vaynerchuk" },
+            { quote: "Jangan pernah menginvestasikan dalam bisnis yang tidak Anda pahami.", author: "Warren Buffett" },
+            { quote: "Waktu lebih berharga daripada uang. Anda bisa mendapatkan lebih banyak uang, tetapi Anda tidak bisa mendapatkan lebih banyak waktu.", author: "Jim Rohn" },
+            { quote: "Jika Anda ingin menjadi kaya, berpikirlah secara besar-besaran, berpikirlah secara berbeda.", author: "Aristotle Onassis" },
+            { quote: "Satu-satunya cara untuk melakukan pekerjaan hebat adalah mencintai apa yang Anda lakukan.", author: "Steve Jobs" },
+            { quote: "Kesempatan tidak terjadi, Anda yang menciptakannya.", author: "Chris Grosser" },
+            { quote: "Jangan takut untuk menyerah pada yang baik demi yang hebat.", author: "John D. Rockefeller" },
+            { quote: "Fokus pada apa yang Anda miliki, bukan pada apa yang Anda inginkan. Ini adalah rahasia kekayaan batin.", author: "Oprah Winfrey" },
+            { quote: "Uang hanyalah ide. Jadilah orang yang menghasilkan ide, bukan sekadar orang yang menggunakan uang orang lain.", author: "Robert Kiyosaki" },
+            { quote: "Jika Anda terlahir miskin, itu bukan kesalahan Anda. Tetapi jika Anda mati miskin, itu adalah kesalahan Anda.", author: "Bill Gates" },
+            { quote: "Penghematan adalah kekayaan. Pemborosan adalah kemiskinan.", author: "Benjamin Franklin" },
+            { quote: "Saya selalu mencoba mengubah setiap bencana menjadi peluang.", author: "John D. Rockefeller" },
+            { quote: "Keputusan terbaik yang dapat Anda ambil adalah tidak boros. Yang kedua adalah berinvestasi dengan baik.", author: "Benjamin Franklin" },
+            { quote: "Investasi terbaik yang dapat Anda lakukan adalah pada diri Anda sendiri. Semakin banyak Anda belajar, semakin banyak Anda hasilkan.", author: "Warren Buffett" },
+            { quote: "Jangan menabung apa yang tersisa setelah dibelanjakan, tetapi belanjakan apa yang tersisa setelah menabung.", author: "Warren Buffett" },
+            { quote: "Setiap kegagalan membawa benih kesuksesan yang setara.", author: "Napoleon Hill" },
+            { quote: "Kualitas adalah yang tersisa setelah harga terlupakan.", author: "Aldo Gucci" },
+            { quote: "Berani ambil risiko. Tanpa mengambil risiko, Anda tidak akan mencapai apa pun.", author: "Mark Zuckerberg" },
+            { quote: "Jika Anda tidak membangun mimpi Anda sendiri, seseorang akan mempekerjakan Anda untuk membangun mimpi mereka.", author: "Dhirubhai Ambani" }
+        ];
 
-    <!-- Filter & Tabel -->
-    <div class="card">
-      <h3>Riwayat Transaksi</h3>
-      <select id="filterTanggal" style="width:100%;padding:6px;margin-bottom:8px;border-radius:6px;"></select>
-      <table>
-        <thead>
-        <tr>
-          <th>Tanggal</th><th>Jenis</th><th>Jumlah</th><th>Keterangan</th><th>Aksi</th>
-        </tr>
-        </thead>
-        <tbody id="transaksiBody"></tbody>
-      </table>
-    </div>
+        // --- Fungsi Utilitas ---
 
-    <!-- Rekap Mingguan -->
-    <div class="card">
-      <h3>Rekap Mingguan</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Minggu</th><th>Rentang</th><th>Pemasukan</th><th>Pengeluaran</th><th>Saldo</th>
-          </tr>
-        </thead>
-        <tbody id="rekapMingguanBody"></tbody>
-      </table>
-    </div>
-
-    <!-- Grafik -->
-    <div class="card">
-      <h3>Grafik Pengeluaran Harian</h3>
-      <canvas id="pengeluaranChart"></canvas>
-    </div>
-
-    <!-- Motivasi -->
-    <div class="motivation" id="motivasi"></div>
-  </div>
-
-<script>
-  const transaksiKey = "transaksiUangJajan";
-  let transaksi = JSON.parse(localStorage.getItem(transaksiKey)) || [];
-
-  const transaksiBody = document.getElementById("transaksiBody");
-  const filterTanggal  = document.getElementById("filterTanggal");
-  const totalPemasukanEl = document.getElementById("totalPemasukan");
-  const totalPengeluaranEl = document.getElementById("totalPengeluaran");
-  const saldoEl = document.getElementById("saldo");
-  const labelBulanEl = document.getElementById("labelBulan");
-  const motivasiEl = document.getElementById("motivasi");
-  const rekapMingguanBody = document.getElementById("rekapMingguanBody");
-  const ctx = document.getElementById("pengeluaranChart").getContext("2d");
-  let chart;
-
-  const motivasiList = [
-    "Elon Musk: Jangan takut gagal, takutlah kalau tidak pernah mencoba.",
-    "Warren Buffett: Habiskan lebih sedikit dari yang kamu hasilkan.",
-    "Jeff Bezos: Fokus pada pelanggan, bukan pesaing.",
-    "Bill Gates: Uang adalah hasil, bukan tujuan.",
-    "Mark Cuban: Kerja keras mengalahkan bakat jika bakat tidak bekerja keras.",
-    "Steve Jobs: Inovasi membedakan pemimpin dan pengikut.",
-    "Jack Ma: Jangan menyerah, hari ini sulit, besok lebih sulit, tapi lusa akan indah."
-  ];
-
-  function acakMotivasi(){
-    motivasiEl.textContent = "💡 " + motivasiList[Math.floor(Math.random()*motivasiList.length)];
-  }
-
-  function simpanData(){ localStorage.setItem(transaksiKey, JSON.stringify(transaksi)); }
-
-  function tambahTransaksi(jenis, jumlah, keterangan, tanggal=null){
-    if(!jumlah || isNaN(jumlah)) return;
-    const tgl = tanggal || new Date().toISOString().split("T")[0];
-    transaksi.push({ jenis, jumlah: parseInt(jumlah), keterangan, tanggal: tgl });
-    simpanData(); render();
-    document.getElementById("jumlah").value = "";
-    document.getElementById("keterangan").value = "";
-  }
-
-  function hapusTransaksi(index){ transaksi.splice(index,1); simpanData(); render(); }
-
-  function renderFilterTanggal(){
-    const tanggalUnik = [...new Set(transaksi.map(t=>t.tanggal))].sort((a,b)=>b.localeCompare(a));
-    filterTanggal.innerHTML = '<option value="">Semua Tanggal</option>';
-    tanggalUnik.forEach(tgl=>{
-      const opt=document.createElement("option"); opt.value=tgl; opt.textContent=tgl; filterTanggal.appendChild(opt);
-    });
-  }
-
-  function getBulanAktif(){
-    if (filterTanggal.value) return filterTanggal.value.slice(0,7);
-    if (transaksi.length){
-      const latest = [...transaksi].sort((a,b)=>b.tanggal.localeCompare(a.tanggal))[0].tanggal;
-      return latest.slice(0,7);
-    }
-    return new Date().toISOString().slice(0,7);
-  }
-
-  function namaBulan(b){
-    const [y,m]=b.split("-"); const nama=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
-    return `${nama[parseInt(m)-1]} ${y}`;
-  }
-
-  function updateSummary(){
-    const bulanAktif = getBulanAktif();
-    const dataBulan = transaksi.filter(t=> t.tanggal.startsWith(bulanAktif));
-    let pemasukan=0, pengeluaran=0;
-    dataBulan.forEach(t=> t.jenis==="pemasukan" ? pemasukan+=t.jumlah : pengeluaran+=t.jumlah);
-    totalPemasukanEl.textContent = pemasukan.toLocaleString('id-ID');
-    totalPengeluaranEl.textContent = pengeluaran.toLocaleString('id-ID');
-    saldoEl.textContent = (pemasukan-pengeluaran).toLocaleString('id-ID');
-    labelBulanEl.textContent = "Bulan aktif: " + namaBulan(bulanAktif);
-  }
-
-  function updateChart(dataHarian){
-    const pengeluaranKategori={};
-    dataHarian.forEach(t=>{
-      if(t.jenis==="pengeluaran"){
-        pengeluaranKategori[t.keterangan]=(pengeluaranKategori[t.keterangan]||0)+t.jumlah;
-      }
-    });
-    const labels=Object.keys(pengeluaranKategori);
-    const data=Object.values(pengeluaranKategori);
-    if(chart) chart.destroy();
-    chart=new Chart(ctx,{type:"pie",data:{labels,datasets:[{data,backgroundColor:["#f87171","#60a5fa","#34d399","#fbbf24","#a78bfa","#f472b6"]}]}})
-  }
-
-  function buatRekapMingguan(){
-    rekapMingguanBody.innerHTML="";
-    if(transaksi.length===0) return;
-    const dataSort = [...transaksi].sort((a,b)=>a.tanggal.localeCompare(b.tanggal));
-    let start = new Date(dataSort[0].tanggal);
-    let end = new Date(start);
-    end.setDate(end.getDate()+6);
-
-    let minggu = 1;
-    let pemasukan=0, pengeluaran=0;
-
-    dataSort.forEach((t,idx)=>{
-      const tgl=new Date(t.tanggal);
-      if(tgl>=start && tgl<=end){
-        if(t.jenis==="pemasukan") pemasukan+=t.jumlah; else pengeluaran+=t.jumlah;
-      }
-      if(tgl>end || idx===dataSort.length-1){
-        // tulis row
-        const row=document.createElement("tr");
-        row.innerHTML=`
-          <td>${minggu}</td>
-          <td>${start.toISOString().slice(0,10)} s/d ${end.toISOString().slice(0,10)}</td>
-          <td>${pemasukan.toLocaleString('id-ID')}</td>
-          <td>${pengeluaran.toLocaleString('id-ID')}</td>
-          <td>${(pemasukan-pengeluaran).toLocaleString('id-ID')}</td>
-        `;
-        rekapMingguanBody.appendChild(row);
-        // reset minggu
-        minggu++;
-        start=new Date(end); start.setDate(start.getDate()+1);
-        end=new Date(start); end.setDate(end.getDate()+6);
-        pemasukan=0; pengeluaran=0;
-        if(tgl>=start && tgl<=end){
-          if(t.jenis==="pemasukan") pemasukan+=t.jumlah; else pengeluaran+=t.jumlah;
+        function loadTransactions() {
+            const storedData = localStorage.getItem(STORAGE_KEY);
+            if (storedData) {
+                transactions = JSON.parse(storedData).map(t => ({
+                    ...t,
+                    date: new Date(t.date) 
+                }));
+            } else {
+                transactions = [];
+            }
         }
-      }
-    });
-  }
 
-  function render(){
-    transaksiBody.innerHTML="";
-    const filter=filterTanggal.value;
-    const dataFilter = filter ? transaksi.filter(t=>t.tanggal===filter) : transaksi;
+        function saveTransactions() {
+            const serializableTransactions = transactions.map(t => ({
+                ...t,
+                date: t.date.toISOString()
+            }));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(serializableTransactions));
+        }
 
-    dataFilter.forEach((t,idx)=>{
-      const row=document.createElement("tr");
-      row.innerHTML=`
-        <td>${t.tanggal}</td>
-        <td>${t.jenis}</td>
-        <td>${t.jumlah.toLocaleString('id-ID')}</td>
-        <td>${t.keterangan}</td>
-        <td><button class="btn-red" onclick="hapusTransaksi(${idx})">X</button></td>
-      `;
-      transaksiBody.appendChild(row);
-    });
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(number);
+        }
 
-    updateSummary();
-    buatRekapMingguan();
+        function getTodayDateString() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+        
+        /**
+         * Menampilkan motivasi acak dari array MOTIVATIONS.
+         */
+        function displayRandomMotivation() {
+            const index = Math.floor(Math.random() * MOTIVATIONS.length);
+            const quoteData = MOTIVATIONS[index];
+            
+            document.getElementById('quoteText').textContent = `"${quoteData.quote}"`;
+            document.getElementById('quoteAuthor').textContent = `- ${quoteData.author} 💡`;
+        }
 
-    if(filter){
-      const dataHarian = transaksi.filter(t=>t.tanggal===filter);
-      updateChart(dataHarian);
-    }else{
-      updateChart([]);
-    }
+        /**
+         * Menampilkan saran berdasarkan Saldo Akhir dan Rasio Pemasukan/Pengeluaran.
+         */
+        function showFinancialAdvice(totalIncome, totalExpense, currentBalance) {
+            const adviceBox = document.getElementById('adviceBox');
+            const adviceMessage = document.getElementById('adviceMessage');
+            const balanceCard = document.getElementById('balanceCard');
+            
+            const CRITICAL_BALANCE_THRESHOLD = 50000; 
+            const EXPENSE_RATIO_THRESHOLD = 0.70;
+            
+            let expenseRatio = 0;
+            if (totalIncome > 0) {
+                expenseRatio = totalExpense / totalIncome;
+            }
+            
+            adviceBox.style.display = 'none';
+            adviceBox.style.backgroundColor = '#fff3cd'; 
+            adviceBox.style.borderColor = '#ffeeba';
+            balanceCard.classList.remove('critical');
 
-    renderFilterTanggal();
-  }
+            if (currentBalance < 0) {
+                adviceBox.style.display = 'block';
+                balanceCard.classList.add('critical');
+                adviceMessage.innerHTML = `
+                    <p>🚨 **PERHATIAN: Saldo Anda saat ini negatif!** Pengeluaran melebihi pemasukan total Anda. Segera lakukan langkah koreksi.</p>
+                    <ul>
+                        <li>**Tinjau Kembali:** Cek riwayat dan identifikasi kategori pengeluaran terbesar.</li>
+                        <li>**Prioritaskan Pemasukan:** Cari peluang untuk segera **menambah penghasilan** (misalnya, kerja paruh waktu online atau menjual barang).</li>
+                    </ul>
+                `;
+            } else if (currentBalance <= CRITICAL_BALANCE_THRESHOLD && totalIncome > 0) {
+                adviceBox.style.display = 'block';
+                balanceCard.classList.add('critical');
+                adviceMessage.innerHTML = `
+                    <p>⚠️ **Saldo Kritis!** Saldo Anda tinggal ${formatRupiah(currentBalance)}. Angka ini sangat tipis.</p>
+                    <ul>
+                        <li>**Kendalikan Belanja:** Tunda semua pengeluaran yang tidak wajib minggu ini.</li>
+                        <li>**Hemat Cerdas:** Cari makanan/transportasi yang lebih murah.</li>
+                        <li>**Peluang Penghasilan:** Pertimbangkan pekerjaan singkat (micro-jobs) atau proyek kecil untuk *booster* saldo.</li>
+                    </ul>
+                `;
+            } else if (expenseRatio >= EXPENSE_RATIO_THRESHOLD) {
+                adviceBox.style.display = 'block';
+                adviceBox.style.backgroundColor = '#d1ecf1';
+                adviceBox.style.borderColor = '#bee5eb';
+                adviceMessage.innerHTML = `
+                    <p>📈 **Waspada!** Pengeluaran Anda sudah mencapai ${Math.round(expenseRatio * 100)}% dari total pemasukan. Ini kurang ideal untuk tabungan.</p>
+                    <ul>
+                        <li>**Identifikasi Pemborosan:** Analisis riwayat Anda. Coba kurangi 10% dari pengeluaran terbesar Anda.</li>
+                        <li>**Inisiatif Penghasilan:** Coba **ide penghasilan sampingan**: jualan jasa desain/tulisan online, dropshipping, atau menjadi asisten virtual.</li>
+                    </ul>
+                `;
+            }
+        }
 
-  filterTanggal.addEventListener("change", render);
+        // --- Logika Inti Aplikasi ---
 
-  render();
-  acakMotivasi();
-</script>
+        function calculateSummary() {
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            transactions.forEach(t => {
+                if (t.type === 'income') {
+                    totalIncome += t.amount;
+                } else if (t.type === 'expense') {
+                    totalExpense += t.amount;
+                }
+            });
+
+            const currentBalance = totalIncome - totalExpense;
+
+            document.getElementById('totalIncome').textContent = formatRupiah(totalIncome);
+            document.getElementById('totalExpense').textContent = formatRupiah(totalExpense);
+            document.getElementById('currentBalance').textContent = formatRupiah(currentBalance);
+            
+            showFinancialAdvice(totalIncome, totalExpense, currentBalance);
+        }
+
+        function renderTransactions() {
+            const filterType = document.getElementById('filterType').value;
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const listElement = document.getElementById('transactionList');
+            const noTransactionsElement = document.getElementById('noTransactions');
+            listElement.innerHTML = '';
+            
+            let filteredTransactions = [...transactions];
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            // Terapkan Filter Riwayat 
+            switch (filterType) {
+                case 'today':
+                    filteredTransactions = filteredTransactions.filter(t => 
+                        t.date.toDateString() === now.toDateString()
+                    );
+                    break;
+                case 'this-week':
+                    const sevenDaysAgo = new Date(now);
+                    sevenDaysAgo.setDate(now.getDate() - 6);
+                    
+                    filteredTransactions = filteredTransactions.filter(t => 
+                        t.date >= sevenDaysAgo && t.date <= now
+                    );
+                    break;
+                case 'this-month':
+                    filteredTransactions = filteredTransactions.filter(t => {
+                        return t.date.getMonth() === now.getMonth() && t.date.getFullYear() === now.getFullYear();
+                    });
+                    break;
+                case 'date-range':
+                    const start = startDateInput.value ? new Date(startDateInput.value) : null;
+                    const end = endDateInput.value ? new Date(endDateInput.value) : null;
+
+                    if (start && end) {
+                        end.setHours(23, 59, 59, 999); 
+                        filteredTransactions = filteredTransactions.filter(t => 
+                            t.date >= start && t.date <= end
+                        );
+                    }
+                    break;
+                case 'all':
+                default:
+                    break;
+            }
+            
+            filteredTransactions.sort((a, b) => b.date - a.date);
+
+            if (filteredTransactions.length === 0) {
+                noTransactionsElement.style.display = 'block';
+            } else {
+                noTransactionsElement.style.display = 'none';
+            }
+
+            filteredTransactions.forEach(t => {
+                const row = document.createElement('tr');
+                row.classList.add(t.type === 'income' ? 'income-row' : 'expense-row');
+
+                const formattedDate = t.date.toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                const typeText = t.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
+                const amountSign = t.type === 'income' ? '+' : '-';
+                const categoryDisplay = t.type === 'expense' ? (t.category || '-') : '-';
+                
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${typeText}</td>
+                    <td>${amountSign}${formatRupiah(t.amount).replace('Rp', '')}</td>
+                    <td>${t.description}</td>
+                    <td>${categoryDisplay}</td>
+                    <td><button class="delete-btn" data-id="${t.id}">Hapus</button></td>
+                `;
+                listElement.appendChild(row);
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    deleteTransaction(this.dataset.id);
+                });
+            });
+        }
+
+        function addTransaction(amount, description, type, dateString, category) {
+            const newTransaction = {
+                id: Date.now(),
+                amount: amount,
+                description: description,
+                type: type,
+                date: new Date(dateString),
+                category: type === 'expense' ? category : null 
+            };
+
+            transactions.push(newTransaction);
+            saveTransactions();
+            calculateSummary(); 
+            renderTransactions(); 
+
+            // Reset form
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('transactionDate').value = getTodayDateString();
+        }
+
+        function deleteTransaction(id) {
+            const transactionId = parseInt(id, 10);
+            
+            transactions = transactions.filter(t => t.id !== transactionId);
+            
+            saveTransactions();
+            calculateSummary();
+            renderTransactions();
+        }
+
+        // --- Event Listeners ---
+
+        document.getElementById('transactionForm').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            
+            const amount = parseInt(document.getElementById('amount').value, 10);
+            const description = document.getElementById('description').value.trim();
+            const dateString = document.getElementById('transactionDate').value;
+            const category = document.getElementById('category').value;
+            const submitterId = event.submitter.id;
+            
+            if (!amount || amount <= 0 || !description || !dateString) {
+                alert('Mohon isi semua kolom (Jumlah, Keterangan, Tanggal) dengan benar.');
+                return;
+            }
+            
+            let type = '';
+            if (submitterId === 'btnIncome') {
+                type = 'income';
+            } else if (submitterId === 'btnExpense') {
+                type = 'expense';
+                if (!category) {
+                    alert('Mohon pilih Kategori untuk Pengeluaran.');
+                    return;
+                }
+            } else {
+                return;
+            }
+            
+            addTransaction(amount, description, type, dateString, category);
+        });
+
+        document.getElementById('btnQuickIncome').addEventListener('click', function() {
+            const amount = 30000;
+            const description = 'Uang Jajan Sekolah';
+            const dateString = document.getElementById('transactionDate').value || getTodayDateString(); 
+            
+            addTransaction(amount, description, 'income', dateString, null); 
+        });
+
+        document.getElementById('filterType').addEventListener('change', function() {
+            const filterType = this.value;
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+
+            if (filterType === 'date-range') {
+                startDateInput.style.display = 'inline-block';
+                endDateInput.style.display = 'inline-block';
+            } else {
+                startDateInput.style.display = 'none';
+                endDateInput.style.display = 'none';
+                renderTransactions(); 
+            }
+        });
+
+        document.getElementById('startDate').addEventListener('change', renderTransactions);
+        document.getElementById('endDate').addEventListener('change', renderTransactions);
+
+
+        // --- Inisialisasi Aplikasi ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tampilkan motivasi acak setiap kali halaman dimuat
+            displayRandomMotivation();
+            
+            const todayString = getTodayDateString();
+            document.getElementById('transactionDate').value = todayString;
+            document.getElementById('startDate').value = todayString;
+            document.getElementById('endDate').value = todayString;
+            
+            loadTransactions();
+            calculateSummary();
+            renderTransactions();
+        });
+    </script>
 </body>
 </html>
