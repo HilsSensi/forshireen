@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catatan Uang Jajan | Filter Kategori Tambahan 💰</title>
+    <title>Catatan Uang Jajan | Saldo Kas, Dana & Bisnis 💰</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
@@ -14,8 +14,9 @@
             --color-success: #2ecc71; /* Hijau */
             --color-danger: #e74c3c; /* Merah */
             --color-warning: #f39c12; /* Kuning */
-            --color-cash: #40c0cb; /* Cyan untuk Saldo Kas */
-            --color-dana: #9b59b6; /* Ungu untuk Saldo Dana */
+            --color-cash: #40c0cb; /* Cyan */
+            --color-dana: #9b59b6; /* Ungu */
+            --color-bisnis: #1abc9c; /* Hijau Mint untuk Bisnis */
             --color-background: #f0f4f8;
             --color-text: #2c3e50;
             --color-white: #ffffff;
@@ -32,7 +33,7 @@
 
         .container {
             width: 100%;
-            max-width: 750px; 
+            max-width: 900px; /* Diperluas sedikit untuk 3 saldo */
             margin: 0 auto;
             padding: 20px 15px; 
             background-color: var(--color-white);
@@ -88,9 +89,36 @@
         /* --- Kartu Ringkasan (Responsive Grid) --- */
         .summary-cards {
             display: grid;
+            /* 6 kartu: Income, Expense, Cash, Dana, Bisnis, Total */
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
             gap: 15px;
             margin-bottom: 20px;
+        }
+        
+        /* Di layar kecil (mobile), buat Total Saldo memanjang */
+        @media (max-width: 600px) {
+             .summary-cards {
+                 grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+             }
+             .summary-cards .card:nth-child(5) { /* Bisnis */
+                 grid-column: span 1;
+             }
+             .summary-cards .card:last-child { /* Total Saldo */
+                 grid-column: span 2; 
+             }
+        }
+        
+        /* Di layar besar (> 900px), atur grid yang lebih spesifik */
+        @media (min-width: 900px) {
+            .summary-cards {
+                grid-template-columns: repeat(6, 1fr); 
+            }
+            .summary-cards .card:nth-child(5) {
+                grid-column: span 1;
+            }
+             .summary-cards .card:last-child {
+                 grid-column: span 1; 
+             }
         }
 
         .card {
@@ -106,6 +134,7 @@
         .expense-card { background: linear-gradient(45deg, var(--color-danger), #c0392b); }
         .cash-card { background: linear-gradient(45deg, var(--color-cash), #39a8b1); }
         .dana-card { background: linear-gradient(45deg, var(--color-dana), #8e44ad); }
+        .bisnis-card { background: linear-gradient(45deg, var(--color-bisnis), #16a085); } /* NEW */
         
         .total-card {
             background: linear-gradient(45deg, var(--color-primary), #2980b9);
@@ -168,62 +197,14 @@
         /* --- Riwayat Transaksi --- */
         .filter-controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Menggunakan grid untuk filter */
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 10px;
             align-items: center;
             margin-bottom: 15px;
         }
-        
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
 
-        .filter-controls label {
-            font-weight: 600;
-            font-size: 0.9em;
-        }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
 
-        .filter-controls select, .filter-controls input[type="date"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.9em;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .history-table-container {
-            overflow-x: auto;
-        }
-
-        #transactionTable {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
-        }
-
-        #transactionTable th, #transactionTable td {
-            padding: 12px 10px; 
-            border-bottom: 1px solid #ecf0f1;
-            text-align: left;
-            font-size: 0.85em; 
-        }
-
-        #transactionTable th {
-            background-color: var(--color-primary);
-            color: var(--color-white);
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .income-row { color: #27ae60; }
-        .expense-row { color: #c0392b; }
-        
         /* Responsive Breakpoints */
         @media (min-width: 600px) {
             .container { padding: 30px 25px; max-width: 1000px; }
@@ -232,14 +213,14 @@
             .button-group button { width: auto; }
             
             .filter-controls {
-                 grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Catatan Uang Jajan Pintar</h1>
+        <h1>Catatan Keuangan Terpisah</h1>
 
         <div id="adviceBox" class="advice-box">
             <strong>Saran Keuangan Cerdas dari AI 🤖</strong>
@@ -265,6 +246,10 @@
                     <h3>Saldo Dana (E-Wallet)</h3>
                     <p id="currentDana">Rp0</p>
                 </div>
+                <div class="card bisnis-card">
+                    <h3>Saldo Bisnis (WiFi)</h3>
+                    <p id="currentBisnis">Rp0</p>
+                </div>
                 <div id="balanceCard" class="card total-card">
                     <h3>Total Saldo (Semua)</h3>
                     <p id="grandTotalBalance">Rp0</p>
@@ -284,7 +269,7 @@
                     </div>
                     <div class="form-group">
                         <label for="description">Keterangan:</label>
-                        <input type="text" id="description" placeholder="Misal: Beli makan siang / Pindah ke Dana" required>
+                        <input type="text" id="description" placeholder="Misal: Beli makan siang / Pindah ke Bisnis" required>
                     </div>
                 </div>
                 
@@ -296,14 +281,16 @@
                     <div class="form-group" id="accountGroup">
                         <label for="sourceAccount">Sumber Saldo:</label>
                         <select id="sourceAccount">
-                            <option value="Cash">Kas (Cash)</option>
+                            <option value="Kas">Kas (Cash)</option>
                             <option value="Dana">Dana (E-Wallet)</option>
+                            <option value="Bisnis">Bisnis (WiFi)</option>
                         </select>
                         <div id="targetAccountGroup" style="margin-top: 10px; display:none;">
                             <label for="targetAccount">Tujuan Saldo:</label>
                             <select id="targetAccount">
                                 <option value="Dana">Dana (E-Wallet)</option>
-                                <option value="Cash">Kas (Cash)</option>
+                                <option value="Kas">Kas (Cash)</option>
+                                <option value="Bisnis">Bisnis (WiFi)</option>
                             </select>
                         </div>
                     </div>
@@ -315,6 +302,7 @@
                             <option value="Transportasi">Transportasi</option>
                             <option value="Edukasi">Edukasi/Peralatan</option>
                             <option value="Hiburan">Hiburan</option>
+                            <option value="Bisnis">Pengeluaran Bisnis</option>
                             <option value="Lain-lain">Lain-lain</option>
                         </select>
                     </div>
@@ -353,6 +341,7 @@
                         <option value="Transportasi">Transportasi</option>
                         <option value="Edukasi">Edukasi/Peralatan</option>
                         <option value="Hiburan">Hiburan</option>
+                        <option value="Bisnis">Pengeluaran Bisnis</option>
                         <option value="Lain-lain">Lain-lain</option>
                     </select>
                 </div>
@@ -396,7 +385,7 @@
 
     <script>
         let transactions = [];
-        const STORAGE_KEY = 'uangJajanTransactionsV4';
+        const STORAGE_KEY = 'uangJajanTransactionsV5'; // Kunci penyimpanan baru
         
         // --- DATA MOTIVASI ---
         const MOTIVATIONS = [
@@ -493,57 +482,62 @@
 
         // --- Logika Inti Aplikasi ---
 
+        /**
+         * REVISI: Menghitung Saldo Kas, Saldo Dana, dan Saldo Bisnis.
+         */
         function calculateSummary() {
             let totalIncome = 0;
             let totalExpense = 0;
             let totalCash = 0;
             let totalDana = 0;
+            let totalBisnis = 0; // NEW ACCOUNT
 
             transactions.forEach(t => {
+                const amount = t.amount;
+                const source = t.sourceAccount;
+                const target = t.targetAccount;
+
                 if (t.type === 'income') {
-                    totalIncome += t.amount;
-                    if (t.sourceAccount === 'Cash') {
-                        totalCash += t.amount;
-                    } else if (t.sourceAccount === 'Dana') {
-                        totalDana += t.amount;
-                    }
+                    totalIncome += amount;
+                    if (source === 'Kas') totalCash += amount;
+                    else if (source === 'Dana') totalDana += amount;
+                    else if (source === 'Bisnis') totalBisnis += amount; // NEW
+                
                 } else if (t.type === 'expense') {
-                    totalExpense += t.amount;
-                    if (t.sourceAccount === 'Cash') {
-                        totalCash -= t.amount;
-                    } else if (t.sourceAccount === 'Dana') {
-                        totalDana -= t.amount;
-                    }
+                    totalExpense += amount;
+                    if (source === 'Kas') totalCash -= amount;
+                    else if (source === 'Dana') totalDana -= amount;
+                    else if (source === 'Bisnis') totalBisnis -= amount; // NEW
+                
                 } else if (t.type === 'transfer') {
-                    // Transfer: Keluar dari sumber, masuk ke tujuan
-                    if (t.sourceAccount === 'Cash') {
-                        totalCash -= t.amount; 
-                        totalDana += t.amount; 
-                    } else if (t.sourceAccount === 'Dana') {
-                        totalDana -= t.amount; 
-                        totalCash += t.amount; 
-                    }
+                    // Keluar dari Sumber
+                    if (source === 'Kas') totalCash -= amount;
+                    else if (source === 'Dana') totalDana -= amount;
+                    else if (source === 'Bisnis') totalBisnis -= amount; // NEW
+
+                    // Masuk ke Tujuan
+                    if (target === 'Kas') totalCash += amount;
+                    else if (target === 'Dana') totalDana += amount;
+                    else if (target === 'Bisnis') totalBisnis += amount; // NEW
                 }
             });
 
-            const grandTotalBalance = totalCash + totalDana;
+            const grandTotalBalance = totalCash + totalDana + totalBisnis; // NEW ACCOUNT
 
             // Update UI Ringkasan
             document.getElementById('totalIncome').textContent = formatRupiah(totalIncome);
             document.getElementById('totalExpense').textContent = formatRupiah(totalExpense);
             document.getElementById('currentCash').textContent = formatRupiah(totalCash);
             document.getElementById('currentDana').textContent = formatRupiah(totalDana);
+            document.getElementById('currentBisnis').textContent = formatRupiah(totalBisnis); // NEW UI
             document.getElementById('grandTotalBalance').textContent = formatRupiah(grandTotalBalance);
             
             showFinancialAdvice(totalIncome, totalExpense, grandTotalBalance);
         }
 
-        /**
-         * REVISI: Menerapkan Filter Kategori selain Filter Waktu.
-         */
         function renderTransactions() {
             const filterTime = document.getElementById('filterTime').value;
-            const filterCategory = document.getElementById('filterCategory').value; // Ambil nilai filter kategori
+            const filterCategory = document.getElementById('filterCategory').value;
             
             const startDateInput = document.getElementById('startDate');
             const endDateInput = document.getElementById('endDate');
@@ -593,8 +587,6 @@
             // 2. Terapkan Filter Kategori
             if (filterCategory !== 'all') {
                 filteredTransactions = filteredTransactions.filter(t => {
-                    // Hanya tampilkan transaksi yang merupakan pengeluaran DAN cocok dengan kategori
-                    // atau yang memiliki jenis transaksi 'expense'
                     return t.type === 'expense' && t.category === filterCategory;
                 });
             }
@@ -698,7 +690,7 @@
             if (mode === 'transfer') {
                 targetGroup.style.display = 'block';
                 categoryGroup.style.display = 'none';
-                document.getElementById('description').placeholder = 'Misal: Pindah dari Kas ke Dana';
+                document.getElementById('description').placeholder = 'Misal: Pindah dari Kas ke Bisnis';
             } else {
                 targetGroup.style.display = 'none';
                 categoryGroup.style.display = 'block';
@@ -789,10 +781,10 @@
             const dateRangeInputs = document.getElementById('dateRangeInputs');
             
             if (filterTime === 'date-range') {
-                dateRangeInputs.style.display = 'grid'; // Tampilkan input tanggal
+                dateRangeInputs.style.display = 'grid'; 
             } else {
-                dateRangeInputs.style.display = 'none'; // Sembunyikan input tanggal
-                renderTransactions(); // Render ulang jika filter waktu non-custom berubah
+                dateRangeInputs.style.display = 'none';
+                renderTransactions();
             }
         });
         
