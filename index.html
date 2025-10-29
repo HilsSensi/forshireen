@@ -17,7 +17,7 @@
             --color-cash: #40c0cb;
             --color-dana: #9b59b6;
             --color-bisnis: #1abc9c;
-            --color-hidden: #34495e; /* Abu-abu Gelap untuk Tabungan Tersembunyi */
+            --color-hidden: #34495e; 
             --color-background: #f0f4f8;
             --color-text: #2c3e50;
             --color-white: #ffffff;
@@ -86,14 +86,12 @@
             margin-bottom: 20px;
         }
         
-        /* Di layar kecil (mobile) */
         @media (max-width: 600px) {
-             .summary-cards .card:last-child { /* Total Saldo */
+             .summary-cards .card:last-child { 
                  grid-column: span 2; 
              }
         }
         
-        /* Di layar besar (> 900px), atur grid yang lebih spesifik */
         @media (min-width: 900px) {
             .summary-cards {
                 grid-template-columns: repeat(7, 1fr); 
@@ -114,7 +112,7 @@
         .dana-card { background: linear-gradient(45deg, var(--color-dana), #8e44ad); }
         .bisnis-card { background: linear-gradient(45deg, var(--color-bisnis), #16a085); }
         .hidden-card { 
-            background: linear-gradient(45deg, var(--color-hidden), #2c3e50); /* NEW CARD STYLE */
+            background: linear-gradient(45deg, var(--color-hidden), #2c3e50);
             position: relative;
         }
         
@@ -142,24 +140,10 @@
             line-height: 1;
         }
         
-        .hidden-card .value-display {
-            display: block;
-        }
-        
-        .hidden-card .hidden-text {
-            font-size: 1.4em;
-            font-weight: 700;
-            display: none;
-        }
-        
-        .hidden-card.is-hidden .value-display {
-            display: none;
-        }
-        
-        .hidden-card.is-hidden .hidden-text {
-            display: block;
-        }
-
+        .hidden-card .value-display { display: block; }
+        .hidden-card .hidden-text { font-size: 1.4em; font-weight: 700; display: none; }
+        .hidden-card.is-hidden .value-display { display: none; }
+        .hidden-card.is-hidden .hidden-text { display: block; }
 
         /* --- Form Transaksi --- */
         .transaction-form { padding: 20px; border: 1px solid #e0e6ed; border-radius: 8px; background: #fdfdfd; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
@@ -172,13 +156,10 @@
         .btn-expense { background-color: var(--color-danger); color: var(--color-white); }
         .btn-quick { background-color: var(--color-warning); color: var(--color-white); }
         .btn-transfer { background-color: var(--color-primary); color: var(--color-white); }
-        .btn-hide { background-color: var(--color-hidden); color: var(--color-white); } /* NEW BUTTON */
-
         .btn-income:hover { background-color: #27ae60; }
         .btn-expense:hover { background-color: #c0392b; }
         .btn-quick:hover { background-color: #d8890e; }
         .btn-transfer:hover { background-color: #2980b9; }
-        .btn-hide:hover { background-color: #2c3e50; }
 
         /* --- Riwayat Transaksi --- */
         .filter-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; align-items: center; margin-bottom: 15px; }
@@ -373,7 +354,7 @@
 
     <script>
         let transactions = [];
-        const STORAGE_KEY = 'uangJajanTransactionsV7'; // Kunci penyimpanan baru
+        const STORAGE_KEY = 'uangJajanTransactionsV7'; 
         
         // --- DATA MOTIVASI ---
         const MOTIVATIONS = [
@@ -487,7 +468,7 @@
         // --- Logika Inti Aplikasi ---
 
         /**
-         * Menghitung Saldo Kas, Dana, Bisnis, dan Tabungan Tersembunyi.
+         * FIX: Memastikan penambahan/pengurangan untuk Kas, Dana, Bisnis sudah benar.
          */
         function calculateSummary() {
             let totalIncome = 0;
@@ -495,7 +476,7 @@
             let totalCash = 0;
             let totalDana = 0;
             let totalBisnis = 0;
-            let totalHidden = 0; // NEW ACCOUNT
+            let totalHidden = 0;
 
             transactions.forEach(t => {
                 const amount = t.amount;
@@ -504,12 +485,14 @@
 
                 if (t.type === 'income') {
                     totalIncome += amount;
+                    // FIX: Akun sumber adalah akun tujuan untuk pemasukan
                     if (source === 'Kas') totalCash += amount;
                     else if (source === 'Dana') totalDana += amount;
                     else if (source === 'Bisnis') totalBisnis += amount;
                 
                 } else if (t.type === 'expense') {
                     totalExpense += amount;
+                    // FIX: Akun sumber adalah akun keluar untuk pengeluaran
                     if (source === 'Kas') totalCash -= amount;
                     else if (source === 'Dana') totalDana -= amount;
                     else if (source === 'Bisnis') totalBisnis -= amount;
@@ -519,17 +502,16 @@
                     if (source === 'Kas') totalCash -= amount;
                     else if (source === 'Dana') totalDana -= amount;
                     else if (source === 'Bisnis') totalBisnis -= amount;
-                    else if (source === 'Tersembunyi') totalHidden -= amount; // Keluar dari Tersembunyi
+                    else if (source === 'Tersembunyi') totalHidden -= amount;
 
                     // Masuk ke Tujuan
                     if (target === 'Kas') totalCash += amount;
                     else if (target === 'Dana') totalDana += amount;
                     else if (target === 'Bisnis') totalBisnis += amount;
-                    else if (target === 'Tersembunyi') totalHidden += amount; // Masuk ke Tersembunyi
+                    else if (target === 'Tersembunyi') totalHidden += amount;
                 }
             });
 
-            // Grand Total Saldo HANYA yang Aktif (Kas, Dana, Bisnis)
             const grandTotalBalance = totalCash + totalDana + totalBisnis; 
 
             // Update UI Ringkasan
@@ -538,7 +520,7 @@
             document.getElementById('currentCash').textContent = formatRupiah(totalCash);
             document.getElementById('currentDana').textContent = formatRupiah(totalDana);
             document.getElementById('currentBisnis').textContent = formatRupiah(totalBisnis);
-            document.getElementById('currentHidden').textContent = formatRupiah(totalHidden); // NEW UI
+            document.getElementById('currentHidden').textContent = formatRupiah(totalHidden); 
             document.getElementById('grandTotalBalance').textContent = formatRupiah(grandTotalBalance);
             
             showFinancialAdvice(totalIncome, totalExpense, grandTotalBalance);
@@ -560,7 +542,6 @@
 
             // 1. Terapkan Filter Waktu
             switch (filterTime) {
-                // ... (Logika filter waktu)
                 case 'today':
                     filteredTransactions = filteredTransactions.filter(t => t.date.toDateString() === now.toDateString());
                     break;
@@ -617,7 +598,6 @@
                     amountSign = '-';
                     sourceTargetDisplay = `Dari: ${t.sourceAccount}`;
                 } else if (t.type === 'transfer') {
-                    // Cek jika ini adalah transfer ke/dari Tabungan Tersembunyi
                     const isHiddenTransfer = t.sourceAccount === 'Tersembunyi' || t.targetAccount === 'Tersembunyi';
 
                     row.classList.add('total-card'); 
@@ -672,6 +652,13 @@
             calculateSummary(); 
             renderTransactions(); 
 
+            // Jika saldo tersembunyi, refresh tampilan agar simbol '••••••' tetap ada
+            if (document.getElementById('hiddenCard').classList.contains('is-hidden')) {
+                // Panggil toggle dua kali untuk me-refresh display value tanpa mengubah status is-hidden
+                toggleHiddenSaldoVisibility();
+                toggleHiddenSaldoVisibility(); 
+            }
+
             document.getElementById('amount').value = '';
             document.getElementById('description').value = '';
             document.getElementById('category').value = '';
@@ -686,6 +673,12 @@
             saveTransactions();
             calculateSummary();
             renderTransactions();
+            
+            // Jika saldo tersembunyi, refresh tampilan agar simbol '••••••' tetap ada
+            if (document.getElementById('hiddenCard').classList.contains('is-hidden')) {
+                toggleHiddenSaldoVisibility();
+                toggleHiddenSaldoVisibility(); 
+            }
         }
 
         // --- Event Listeners ---
@@ -709,7 +702,6 @@
             }
             
             // Atur opsi Source/Target untuk mode Transfer
-            // Dalam mode Transfer/Pindah Saldo, kedua akun bisa dipilih
             const isTransferMode = mode === 'transfer';
 
             // Opsi Sumber: Tabungan Tersembunyi hanya muncul jika mode transfer
