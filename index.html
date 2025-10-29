@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catatan Uang Jajan | Saldo Kas, Dana, Bisnis & Tabungan 💰</title>
+    <title>Catatan Uang Jajan | Saldo Kas, Dana & Bisnis 💰</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
         
         :root {
             /* Warna Palet */
-            --color-primary: #3498db; 
-            --color-success: #2ecc71;
-            --color-danger: #e74c3c;
-            --color-warning: #f39c12; 
-            --color-cash: #40c0cb;
-            --color-dana: #9b59b6;
-            --color-bisnis: #1abc9c;
-            --color-hidden: #34495e; 
+            --color-primary: #3498db; /* Biru */
+            --color-success: #2ecc71; /* Hijau */
+            --color-danger: #e74c3c; /* Merah */
+            --color-warning: #f39c12; /* Kuning */
+            --color-cash: #40c0cb; /* Cyan */
+            --color-dana: #9b59b6; /* Ungu */
+            --color-bisnis: #1abc9c; /* Hijau Mint untuk Bisnis */
             --color-background: #f0f4f8;
             --color-text: #2c3e50;
             --color-white: #ffffff;
@@ -34,7 +33,7 @@
 
         .container {
             width: 100%;
-            max-width: 1100px;
+            max-width: 900px; /* Diperluas sedikit untuk 3 saldo */
             margin: 0 auto;
             padding: 20px 15px; 
             background-color: var(--color-white);
@@ -77,25 +76,49 @@
             display: none; 
             font-size: 0.9em;
         }
+        
+        .advice-box strong {
+            color: var(--color-text);
+        }
+        
+        .advice-box ul {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
 
         /* --- Kartu Ringkasan (Responsive Grid) --- */
         .summary-cards {
             display: grid;
+            /* 6 kartu: Income, Expense, Cash, Dana, Bisnis, Total */
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
             gap: 15px;
             margin-bottom: 20px;
         }
         
+        /* Di layar kecil (mobile), buat Total Saldo memanjang */
         @media (max-width: 600px) {
-             .summary-cards .card:last-child { 
+             .summary-cards {
+                 grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+             }
+             .summary-cards .card:nth-child(5) { /* Bisnis */
+                 grid-column: span 1;
+             }
+             .summary-cards .card:last-child { /* Total Saldo */
                  grid-column: span 2; 
              }
         }
         
+        /* Di layar besar (> 900px), atur grid yang lebih spesifik */
         @media (min-width: 900px) {
             .summary-cards {
-                grid-template-columns: repeat(7, 1fr); 
+                grid-template-columns: repeat(6, 1fr); 
             }
+            .summary-cards .card:nth-child(5) {
+                grid-column: span 1;
+            }
+             .summary-cards .card:last-child {
+                 grid-column: span 1; 
+             }
         }
 
         .card {
@@ -104,80 +127,94 @@
             text-align: left;
             color: var(--color-white);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
         }
         
         .income-card { background: linear-gradient(45deg, var(--color-success), #27ae60); }
         .expense-card { background: linear-gradient(45deg, var(--color-danger), #c0392b); }
         .cash-card { background: linear-gradient(45deg, var(--color-cash), #39a8b1); }
         .dana-card { background: linear-gradient(45deg, var(--color-dana), #8e44ad); }
-        .bisnis-card { background: linear-gradient(45deg, var(--color-bisnis), #16a085); }
-        .hidden-card { 
-            background: linear-gradient(45deg, var(--color-hidden), #2c3e50);
-            position: relative;
-        }
+        .bisnis-card { background: linear-gradient(45deg, var(--color-bisnis), #16a085); } /* NEW */
         
         .total-card {
             background: linear-gradient(45deg, var(--color-primary), #2980b9);
         }
         
-        .total-card.critical { background: linear-gradient(45deg, var(--color-warning), #d8890e); }
+        .total-card.critical {
+             background: linear-gradient(45deg, var(--color-warning), #d8890e);
+        }
 
         .card h3 { margin-top: 0; font-size: 0.8em; opacity: 0.9; }
         .card p { font-size: 1.4em; font-weight: 700; margin-bottom: 0; }
-        
-        /* Gaya Khusus untuk Kartu Tabungan Tersembunyi */
-        .hidden-toggle-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 5px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1em;
-            line-height: 1;
-        }
-        
-        .hidden-card .value-display { display: block; }
-        .hidden-card .hidden-text { font-size: 1.4em; font-weight: 700; display: none; }
-        .hidden-card.is-hidden .value-display { display: none; }
-        .hidden-card.is-hidden .hidden-text { display: block; }
 
         /* --- Form Transaksi --- */
-        .transaction-form { padding: 20px; border: 1px solid #e0e6ed; border-radius: 8px; background: #fdfdfd; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
-        .form-row { display: flex; gap: 15px; margin-bottom: 10px; flex-direction: column; }
+        .transaction-form {
+            padding: 20px;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            background: #fdfdfd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-direction: column; 
+        }
+        
         .form-group label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.9em; }
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 0.9em; }
-        .button-group { display: flex; gap: 10px; margin-top: 15px; flex-direction: column; }
-        .button-group button { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 1em; transition: background-color 0.3s; }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-direction: column; 
+        }
+
+        .button-group button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        
         .btn-income { background-color: var(--color-success); color: var(--color-white); }
         .btn-expense { background-color: var(--color-danger); color: var(--color-white); }
         .btn-quick { background-color: var(--color-warning); color: var(--color-white); }
         .btn-transfer { background-color: var(--color-primary); color: var(--color-white); }
+
         .btn-income:hover { background-color: #27ae60; }
         .btn-expense:hover { background-color: #c0392b; }
         .btn-quick:hover { background-color: #d8890e; }
         .btn-transfer:hover { background-color: #2980b9; }
 
         /* --- Riwayat Transaksi --- */
-        .filter-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; align-items: center; margin-bottom: 15px; }
+        .filter-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
         .filter-group { display: flex; flex-direction: column; gap: 5px; }
-        .history-table-container { overflow-x: auto; }
-        #transactionTable th, #transactionTable td { padding: 12px 10px; border-bottom: 1px solid #ecf0f1; text-align: left; font-size: 0.85em; }
-        #transactionTable th { background-color: var(--color-primary); color: var(--color-white); font-weight: 600; text-transform: uppercase; }
-        .income-row { color: #27ae60; }
-        .expense-row { color: #c0392b; }
-        .motivation { text-align: center; margin-top: 30px; padding: 20px; background-color: #ecf0f1; border-radius: 10px; color: #4a698c; border-left: 5px solid var(--color-primary); font-size: 0.95em; }
-        
+
         /* Responsive Breakpoints */
         @media (min-width: 600px) {
-            .container { padding: 30px 25px; max-width: 1100px; }
+            .container { padding: 30px 25px; max-width: 1000px; }
             .form-row { flex-direction: row; }
             .button-group { flex-direction: row; }
             .button-group button { width: auto; }
-            .filter-controls { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+            
+            .filter-controls {
+                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
         }
     </style>
 </head>
@@ -213,14 +250,8 @@
                     <h3>Saldo Bisnis (WiFi)</h3>
                     <p id="currentBisnis">Rp0</p>
                 </div>
-                <div id="hiddenCard" class="card hidden-card is-hidden">
-                    <h3>Tabungan Tersembunyi</h3>
-                    <button id="toggleHiddenBtn" class="hidden-toggle-btn">👀</button>
-                    <p id="currentHidden" class="value-display">Rp0</p>
-                    <p class="hidden-text">••••••</p>
-                </div>
                 <div id="balanceCard" class="card total-card">
-                    <h3>Total Saldo Aktif</h3>
+                    <h3>Total Saldo (Semua)</h3>
                     <p id="grandTotalBalance">Rp0</p>
                 </div>
             </div>
@@ -238,7 +269,7 @@
                     </div>
                     <div class="form-group">
                         <label for="description">Keterangan:</label>
-                        <input type="text" id="description" placeholder="Misal: Beli makan siang / Pindah ke Tabungan" required>
+                        <input type="text" id="description" placeholder="Misal: Beli makan siang / Pindah ke Bisnis" required>
                     </div>
                 </div>
                 
@@ -260,7 +291,7 @@
                                 <option value="Dana">Dana (E-Wallet)</option>
                                 <option value="Kas">Kas (Cash)</option>
                                 <option value="Bisnis">Bisnis (WiFi)</option>
-                                <option value="Tersembunyi">Tabungan Tersembunyi</option> </select>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group" id="categoryGroup">
@@ -354,7 +385,7 @@
 
     <script>
         let transactions = [];
-        const STORAGE_KEY = 'uangJajanTransactionsV7'; 
+        const STORAGE_KEY = 'uangJajanTransactionsV5'; // Kunci penyimpanan baru
         
         // --- DATA MOTIVASI ---
         const MOTIVATIONS = [
@@ -414,22 +445,6 @@
             document.getElementById('quoteText').textContent = `"${quoteData.quote}"`;
             document.getElementById('quoteAuthor').textContent = `- ${quoteData.author} 💡`;
         }
-        
-        /**
-         * Logika toggle Hide/Show Saldo TERSEMBUNYI
-         */
-        function toggleHiddenSaldoVisibility() {
-            const hiddenCard = document.getElementById('hiddenCard');
-            const toggleBtn = document.getElementById('toggleHiddenBtn');
-            const isHidden = hiddenCard.classList.toggle('is-hidden');
-
-            if (isHidden) {
-                toggleBtn.textContent = '👀';
-            } else {
-                toggleBtn.textContent = '🔒';
-            }
-        }
-
 
         function showFinancialAdvice(totalIncome, totalExpense, currentBalance) {
             const adviceBox = document.getElementById('adviceBox');
@@ -452,11 +467,11 @@
             if (currentBalance < 0) {
                 adviceBox.style.display = 'block';
                 balanceCard.classList.add('critical');
-                adviceMessage.innerHTML = `<p>🚨 **PERHATIAN: Saldo Aktif Anda saat ini negatif!** Pengeluaran melebihi pemasukan total Anda. Segera lakukan langkah koreksi.</p><ul><li>**Tinjau Kembali:** Cek riwayat.</li><li>**Prioritaskan Pemasukan:** Cari peluang untuk segera **menambah penghasilan**.</li></ul>`;
+                adviceMessage.innerHTML = `<p>🚨 **PERHATIAN: Saldo Anda saat ini negatif!** Pengeluaran melebihi pemasukan total Anda. Segera lakukan langkah koreksi.</p><ul><li>**Tinjau Kembali:** Cek riwayat.</li><li>**Prioritaskan Pemasukan:** Cari peluang untuk segera **menambah penghasilan**.</li></ul>`;
             } else if (currentBalance <= CRITICAL_BALANCE_THRESHOLD && totalIncome > 0) {
                 adviceBox.style.display = 'block';
                 balanceCard.classList.add('critical');
-                adviceMessage.innerHTML = `<p>⚠️ **Saldo Kritis!** Saldo Aktif Anda tinggal ${formatRupiah(currentBalance)}. Angka ini sangat tipis.</p><ul><li>**Kendalikan Belanja:** Tunda semua pengeluaran yang tidak wajib.</li><li>**Tarik Tabungan:** Jika mendesak, pertimbangkan untuk menarik dari Tabungan Tersembunyi.</li></ul>`;
+                adviceMessage.innerHTML = `<p>⚠️ **Saldo Kritis!** Saldo Anda tinggal ${formatRupiah(currentBalance)}. Angka ini sangat tipis.</p><ul><li>**Kendalikan Belanja:** Tunda semua pengeluaran yang tidak wajib.</li><li>**Peluang Penghasilan:** Pertimbangkan pekerjaan singkat (micro-jobs) atau proyek kecil untuk *booster* saldo.</li></ul>`;
             } else if (expenseRatio >= EXPENSE_RATIO_THRESHOLD) {
                 adviceBox.style.display = 'block';
                 adviceBox.style.backgroundColor = '#d1ecf1';
@@ -468,15 +483,14 @@
         // --- Logika Inti Aplikasi ---
 
         /**
-         * FIX: Memastikan penambahan/pengurangan untuk Kas, Dana, Bisnis sudah benar.
+         * REVISI: Menghitung Saldo Kas, Saldo Dana, dan Saldo Bisnis.
          */
         function calculateSummary() {
             let totalIncome = 0;
             let totalExpense = 0;
             let totalCash = 0;
             let totalDana = 0;
-            let totalBisnis = 0;
-            let totalHidden = 0;
+            let totalBisnis = 0; // NEW ACCOUNT
 
             transactions.forEach(t => {
                 const amount = t.amount;
@@ -485,42 +499,37 @@
 
                 if (t.type === 'income') {
                     totalIncome += amount;
-                    // FIX: Pemasukan bertambah di akun yang dipilih (sourceAccount)
                     if (source === 'Kas') totalCash += amount;
                     else if (source === 'Dana') totalDana += amount;
-                    else if (source === 'Bisnis') totalBisnis += amount;
+                    else if (source === 'Bisnis') totalBisnis += amount; // NEW
                 
                 } else if (t.type === 'expense') {
                     totalExpense += amount;
-                    // FIX: Pengeluaran berkurang di akun yang dipilih (sourceAccount)
                     if (source === 'Kas') totalCash -= amount;
                     else if (source === 'Dana') totalDana -= amount;
-                    else if (source === 'Bisnis') totalBisnis -= amount;
+                    else if (source === 'Bisnis') totalBisnis -= amount; // NEW
                 
                 } else if (t.type === 'transfer') {
                     // Keluar dari Sumber
                     if (source === 'Kas') totalCash -= amount;
                     else if (source === 'Dana') totalDana -= amount;
-                    else if (source === 'Bisnis') totalBisnis -= amount;
-                    else if (source === 'Tersembunyi') totalHidden -= amount;
+                    else if (source === 'Bisnis') totalBisnis -= amount; // NEW
 
                     // Masuk ke Tujuan
                     if (target === 'Kas') totalCash += amount;
                     else if (target === 'Dana') totalDana += amount;
-                    else if (target === 'Bisnis') totalBisnis += amount;
-                    else if (target === 'Tersembunyi') totalHidden += amount;
+                    else if (target === 'Bisnis') totalBisnis += amount; // NEW
                 }
             });
 
-            const grandTotalBalance = totalCash + totalDana + totalBisnis; 
+            const grandTotalBalance = totalCash + totalDana + totalBisnis; // NEW ACCOUNT
 
             // Update UI Ringkasan
             document.getElementById('totalIncome').textContent = formatRupiah(totalIncome);
             document.getElementById('totalExpense').textContent = formatRupiah(totalExpense);
             document.getElementById('currentCash').textContent = formatRupiah(totalCash);
             document.getElementById('currentDana').textContent = formatRupiah(totalDana);
-            document.getElementById('currentBisnis').textContent = formatRupiah(totalBisnis);
-            document.getElementById('currentHidden').textContent = formatRupiah(totalHidden); 
+            document.getElementById('currentBisnis').textContent = formatRupiah(totalBisnis); // NEW UI
             document.getElementById('grandTotalBalance').textContent = formatRupiah(grandTotalBalance);
             
             showFinancialAdvice(totalIncome, totalExpense, grandTotalBalance);
@@ -543,22 +552,31 @@
             // 1. Terapkan Filter Waktu
             switch (filterTime) {
                 case 'today':
-                    filteredTransactions = filteredTransactions.filter(t => t.date.toDateString() === now.toDateString());
+                    filteredTransactions = filteredTransactions.filter(t => 
+                        t.date.toDateString() === now.toDateString()
+                    );
                     break;
                 case 'this-week':
                     const sevenDaysAgo = new Date(now);
                     sevenDaysAgo.setDate(now.getDate() - 6);
-                    filteredTransactions = filteredTransactions.filter(t => t.date >= sevenDaysAgo && t.date <= now);
+                    filteredTransactions = filteredTransactions.filter(t => 
+                        t.date >= sevenDaysAgo && t.date <= now
+                    );
                     break;
                 case 'this-month':
-                    filteredTransactions = filteredTransactions.filter(t => t.date.getMonth() === now.getMonth() && t.date.getFullYear() === now.getFullYear());
+                    filteredTransactions = filteredTransactions.filter(t => {
+                        return t.date.getMonth() === now.getMonth() && t.date.getFullYear() === now.getFullYear();
+                    });
                     break;
                 case 'date-range':
                     const start = startDateInput.value ? new Date(startDateInput.value) : null;
                     const end = endDateInput.value ? new Date(endDateInput.value) : null;
+
                     if (start && end) {
                         end.setHours(23, 59, 59, 999); 
-                        filteredTransactions = filteredTransactions.filter(t => t.date >= start && t.date <= end);
+                        filteredTransactions = filteredTransactions.filter(t => 
+                            t.date >= start && t.date <= end
+                        );
                     }
                     break;
                 case 'all':
@@ -568,7 +586,9 @@
             
             // 2. Terapkan Filter Kategori
             if (filterCategory !== 'all') {
-                filteredTransactions = filteredTransactions.filter(t => t.type === 'expense' && t.category === filterCategory);
+                filteredTransactions = filteredTransactions.filter(t => {
+                    return t.type === 'expense' && t.category === filterCategory;
+                });
             }
 
             
@@ -598,20 +618,12 @@
                     amountSign = '-';
                     sourceTargetDisplay = `Dari: ${t.sourceAccount}`;
                 } else if (t.type === 'transfer') {
-                    const isHiddenTransfer = t.sourceAccount === 'Tersembunyi' || t.targetAccount === 'Tersembunyi';
-
                     row.classList.add('total-card'); 
-                    row.style.color = isHiddenTransfer ? 'var(--color-hidden)' : 'var(--color-primary)';
+                    row.style.color = 'var(--color-primary)';
                     typeText = 'Pindah Saldo';
                     amountSign = '';
                     sourceTargetDisplay = `${t.sourceAccount} → ${t.targetAccount}`;
                     categoryDisplay = '-';
-
-                    if (isHiddenTransfer) {
-                         typeText = (t.sourceAccount === 'Tersembunyi') ? '🔓 Tarik Tabungan' : '🔒 Tabungan';
-                         amountSign = (t.sourceAccount === 'Tersembunyi') ? '+' : '-';
-                         row.classList.remove('total-card');
-                    }
                 }
 
                 const formattedDate = t.date.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -652,12 +664,6 @@
             calculateSummary(); 
             renderTransactions(); 
 
-            // Jika saldo tersembunyi, refresh tampilan agar simbol '••••••' tetap ada
-            if (document.getElementById('hiddenCard').classList.contains('is-hidden')) {
-                toggleHiddenSaldoVisibility();
-                toggleHiddenSaldoVisibility(); 
-            }
-
             document.getElementById('amount').value = '';
             document.getElementById('description').value = '';
             document.getElementById('category').value = '';
@@ -672,12 +678,6 @@
             saveTransactions();
             calculateSummary();
             renderTransactions();
-            
-            // Jika saldo tersembunyi, refresh tampilan agar simbol '••••••' tetap ada
-            if (document.getElementById('hiddenCard').classList.contains('is-hidden')) {
-                toggleHiddenSaldoVisibility();
-                toggleHiddenSaldoVisibility(); 
-            }
         }
 
         // --- Event Listeners ---
@@ -686,32 +686,17 @@
         function toggleFormInputs(mode) {
             const targetGroup = document.getElementById('targetAccountGroup');
             const categoryGroup = document.getElementById('categoryGroup');
-            const targetSelect = document.getElementById('targetAccount');
-            const sourceSelect = document.getElementById('sourceAccount');
             
-            // Atur visibility Target Account dan Category
             if (mode === 'transfer') {
                 targetGroup.style.display = 'block';
                 categoryGroup.style.display = 'none';
                 document.getElementById('description').placeholder = 'Misal: Pindah dari Kas ke Bisnis';
-            } else { // income, expense, quick
+            } else {
                 targetGroup.style.display = 'none';
                 categoryGroup.style.display = 'block';
                 document.getElementById('description').placeholder = 'Misal: Beli makan siang';
             }
-            
-            // Atur opsi Source/Target untuk mode Transfer
-            const isTransferMode = mode === 'transfer';
-
-            // Opsi Sumber: Tabungan Tersembunyi hanya muncul jika mode transfer
-            sourceSelect.querySelector('option[value="Tersembunyi"]').style.display = isTransferMode ? 'block' : 'none';
-            // Opsi Tujuan: Tabungan Tersembunyi hanya muncul jika mode transfer
-            targetSelect.querySelector('option[value="Tersembunyi"]').style.display = isTransferMode ? 'block' : 'none';
         }
-
-        // Listener baru untuk tombol Hide/Show Tabungan Tersembunyi
-        document.getElementById('toggleHiddenBtn').addEventListener('click', toggleHiddenSaldoVisibility);
-
 
         // Listener untuk Tombol Pindah Saldo (Transfer)
         document.getElementById('btnTransfer').addEventListener('click', function(event) {
@@ -790,6 +775,7 @@
         
         // --- Event Listeners Filter Riwayat ---
 
+        // Ganti event listener filter Waktu
         document.getElementById('filterTime').addEventListener('change', function() {
             const filterTime = this.value;
             const dateRangeInputs = document.getElementById('dateRangeInputs');
@@ -802,7 +788,10 @@
             }
         });
         
+        // Tambahkan event listener filter Kategori
         document.getElementById('filterCategory').addEventListener('change', renderTransactions);
+
+
         document.getElementById('startDate').addEventListener('change', renderTransactions);
         document.getElementById('endDate').addEventListener('change', renderTransactions);
 
